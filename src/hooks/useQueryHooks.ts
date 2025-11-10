@@ -1,9 +1,6 @@
-// Example custom hooks using TanStack Query
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 
-// Example: Fetch user data
 export function useUser(userId: string) {
   return useQuery({
     queryKey: ["user", userId],
@@ -12,7 +9,6 @@ export function useUser(userId: string) {
   });
 }
 
-// Example: Fetch all posts
 export function usePosts() {
   return useQuery({
     queryKey: ["posts"],
@@ -20,7 +16,6 @@ export function usePosts() {
   });
 }
 
-// Example: Create a post mutation
 export function useCreatePost() {
   const queryClient = useQueryClient();
 
@@ -34,7 +29,6 @@ export function useCreatePost() {
   });
 }
 
-// Example: Update post mutation
 export function useUpdatePost() {
   const queryClient = useQueryClient();
 
@@ -52,7 +46,6 @@ export function useUpdatePost() {
   });
 }
 
-// Example: Delete post mutation
 export function useDeletePost() {
   const queryClient = useQueryClient();
 
