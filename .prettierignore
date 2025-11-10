@@ -1,0 +1,11 @@
+node_modules
+.next
+.cache
+dist
+build
+*.lock
+.env
+.env.local
+.env.production
+bun.lockb
+
