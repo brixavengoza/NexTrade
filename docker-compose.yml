@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: nextshad-boilerplate
+    container_name: nextrade
     ports:
       - "3000:3000"
     environment:

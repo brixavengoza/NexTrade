@@ -1,13 +1,16 @@
 // App wide constants
 
-export const APP_NAME = "NextShad Boilerplate";
+export const APP_NAME = "NextTrade";
 export const APP_DESCRIPTION =
   "A modern Next.js boilerplate with TypeScript, Tailwind CSS, and shadcn/ui components.";
 
 export const ROUTES = {
   HOME: "/",
-  ABOUT: "/about",
-  CONTACT: "/contact",
+  TRADE: "/trade",
+  PORTFOLIO: "/portfolio",
+  LEADERBOARD: "/leaderboard",
+  PROFILE: "/profile",
+  COMPLIANCE: "/compliance",
 } as const;
 
 export const API_ROUTES = {
