@@ -7,6 +7,11 @@ export const config = {
     baseUrl: process.env.NEXT_PUBLIC_API_URL || "/api",
     timeout: 30000,
   },
+  web3: {
+    walletConnectProjectId:
+      process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ||
+      "c9f7689f0f7fcf217b53a3068f1819e1",
+  },
   external: {
     coingeckoBaseUrl: process.env.NEXT_PUBLIC_COINGECKO_BASE_URL || "",
     defillamaProtocolsUrl:

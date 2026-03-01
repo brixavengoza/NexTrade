@@ -11,7 +11,7 @@ export function MarketOverviewPageClient() {
     <div className="space-y-6">
       <MarketTickerTape />
 
-      <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-6 px-6 lg:grid-cols-12">
+      <div className="mx-auto grid max-w-[var(--content-max-width)] grid-cols-1 gap-6 px-6 lg:grid-cols-12">
         <MarketMoversPanel />
         <BtcChartPanel />
         <div className="flex flex-col gap-6 lg:col-span-3">

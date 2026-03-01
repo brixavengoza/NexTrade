@@ -1,26 +1,13 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import "@rainbow-me/rainbowkit/styles.css";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { Web3Provider } from "@/components/providers/Web3Provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteShell } from "@/components/layout/site-shell";
 import { APP_DESCRIPTION, APP_NAME } from "@/constants";
 import { Analytics } from "@vercel/analytics/next";
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  display: "swap",
-});
-
-const jetBrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: APP_NAME,
@@ -34,9 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${spaceGrotesk.variable} ${jetBrainsMono.variable} font-sans antialiased`}
-      >
+      <body className="font-sans antialiased">
         <Analytics />
         <QueryProvider>
           <ThemeProvider
@@ -45,7 +30,9 @@ export default function RootLayout({
             enableSystem={false}
             disableTransitionOnChange
           >
-            <SiteShell>{children}</SiteShell>
+            <Web3Provider>
+              <SiteShell>{children}</SiteShell>
+            </Web3Provider>
             <Toaster />
           </ThemeProvider>
         </QueryProvider>

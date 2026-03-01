@@ -1,0 +1,828 @@
+<!doctype html>
+
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>NexTrade Trading Terminal</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <!-- Tailwind Config -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#00e5ff",
+              "primary-hover": "#00b8cc",
+              "bg-darkest": "#080B11",
+              "bg-dark": "#0f2224",
+              "bg-panel": "#132b2e",
+              "border-color": "#20474b",
+              "accent-green": "#0bda54",
+              "accent-red": "#ff4d4d",
+              "text-secondary": "#8dc8ce",
+            },
+            fontFamily: {
+              display: ["Manrope", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0f2224;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #20474b;
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #2e656b;
+      }
+
+      /* Scanline Effect */
+      .scanlines {
+        background: linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0),
+          rgba(255, 255, 255, 0) 50%,
+          rgba(0, 0, 0, 0.1) 50%,
+          rgba(0, 0, 0, 0.1)
+        );
+        background-size: 100% 4px;
+        pointer-events: none;
+      }
+
+      /* Range Slider Styling */
+      input[type="range"] {
+        -webkit-appearance: none;
+        background: transparent;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+      }
+      input[type="range"]:focus {
+        outline: none;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-bg-darkest flex h-screen flex-col overflow-hidden font-display text-slate-100"
+  >
+    <!-- Top Navigation Bar -->
+    <header
+      class="bg-bg-dark border-border-color z-20 flex h-14 flex-none items-center justify-between border-b px-4"
+    >
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2">
+          <div class="size-6 text-primary">
+            <svg
+              fill="none"
+              viewbox="0 0 48 48"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                clip-rule="evenodd"
+                d="M12.0799 24L4 19.2479L9.95537 8.75216L18.04 13.4961L18.0446 4H29.9554L29.96 13.4961L38.0446 8.75216L44 19.2479L35.92 24L44 28.7521L38.0446 39.2479L29.96 34.5039L29.9554 44H18.0446L18.04 34.5039L9.95537 39.2479L4 28.7521L12.0799 24Z"
+                fill="currentColor"
+                fill-rule="evenodd"
+              ></path>
+            </svg>
+          </div>
+          <h1 class="text-lg font-bold tracking-tight text-white">NexTrade</h1>
+        </div>
+        <!-- Ticker Stats -->
+        <div
+          class="border-border-color hidden h-8 items-center gap-6 border-l pl-6 lg:flex"
+        >
+          <div class="flex items-center gap-3">
+            <span class="font-bold text-white">BTC/USDT</span>
+            <span class="text-accent-green font-mono text-lg font-bold"
+              >41,230.50</span
+            >
+          </div>
+          <div class="flex items-center gap-4 text-xs">
+            <div class="flex flex-col">
+              <span class="text-text-secondary">24h Change</span>
+              <span class="text-accent-green font-mono">+5.23%</span>
+            </div>
+            <div class="bg-border-color h-6 w-px"></div>
+            <div class="flex flex-col">
+              <span class="text-text-secondary">24h High</span>
+              <span class="font-mono text-white">42,500</span>
+            </div>
+            <div class="bg-border-color h-6 w-px"></div>
+            <div class="flex flex-col">
+              <span class="text-text-secondary">24h Low</span>
+              <span class="font-mono text-white">39,800</span>
+            </div>
+            <div class="bg-border-color h-6 w-px"></div>
+            <div class="flex flex-col">
+              <span class="text-text-secondary">24h Vol</span>
+              <span class="font-mono text-white">1.2B</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button
+          class="bg-bg-panel hover:bg-border-color rounded-lg p-2 text-white transition-colors"
+        >
+          <span class="material-symbols-outlined text-[20px]">settings</span>
+        </button>
+        <button
+          class="bg-bg-panel hover:bg-border-color relative rounded-lg p-2 text-white transition-colors"
+        >
+          <span class="material-symbols-outlined text-[20px]"
+            >notifications</span
+          >
+          <span
+            class="bg-accent-red absolute right-2 top-2 h-2 w-2 rounded-full"
+          ></span>
+        </button>
+        <button
+          class="hover:bg-primary-hover text-bg-darkest rounded-lg bg-primary px-4 py-2 text-sm font-bold transition-colors"
+        >
+          Connect Wallet
+        </button>
+      </div>
+    </header>
+    <!-- Main Content Grid -->
+    <main class="flex flex-1 overflow-hidden">
+      <!-- Left Panel: Order Book (20%) -->
+      <aside
+        class="bg-bg-dark border-border-color relative z-10 flex w-[20%] min-w-[280px] flex-col border-r"
+      >
+        <!-- Header -->
+        <div
+          class="border-border-color flex items-center justify-between border-b px-4 py-3"
+        >
+          <h3 class="text-text-secondary text-sm font-semibold">Order Book</h3>
+          <div class="flex gap-1">
+            <button
+              class="bg-bg-panel text-text-secondary rounded px-2 py-1 text-xs transition hover:text-white"
+            >
+              0.01
+            </button>
+            <button
+              class="bg-bg-panel rounded px-2 py-1 text-xs text-white transition hover:text-white"
+            >
+              0.1
+            </button>
+            <button
+              class="bg-bg-panel text-text-secondary rounded px-2 py-1 text-xs transition hover:text-white"
+            >
+              1
+            </button>
+          </div>
+        </div>
+        <!-- Column Headers -->
+        <div
+          class="text-text-secondary border-border-color flex border-b px-4 py-2 font-mono text-xs"
+        >
+          <div class="flex-1">Price (USDT)</div>
+          <div class="flex-1 text-right">Size</div>
+          <div class="flex-1 text-right">Total</div>
+        </div>
+        <!-- Asks (Red) -->
+        <div class="scanlines relative flex-1 overflow-y-auto">
+          <!-- Ask Items -->
+          <div class="flex min-h-0 flex-col-reverse justify-end">
+            <div
+              class="hover:bg-bg-panel group relative flex cursor-pointer px-4 py-1"
+            >
+              <div
+                class="bg-accent-red/10 group-hover:bg-accent-red/20 absolute inset-y-0 right-0 w-[30%] transition-all"
+              ></div>
+              <span
+                class="text-accent-red relative z-10 flex-1 font-mono text-xs"
+                >41,245.50</span
+              >
+              <span
+                class="relative z-10 flex-1 text-right font-mono text-xs text-slate-300"
+                >0.452</span
+              >
+              <span
+                class="relative z-10 flex-1 text-right font-mono text-xs text-slate-400"
+                >18.6K</span
+              >
+            </div>
+            <div
+              class="hover:bg-bg-panel group relative flex cursor-pointer px-4 py-1"
+            >
+              <div
+                class="bg-accent-red/10 group-hover:bg-accent-red/20 absolute inset-y-0 right-0 w-[55%] transition-all"
+              ></div>
+              <span
+                class="text-accent-red relative z-10 flex-1 font-mono text-xs"
+                >41,244.00</span
+              >
+              <span
+                class="relative z-10 flex-1 text-right font-mono text-xs text-slate-300"
+                >1.200</span
+              >
+              <span
+                class="relative z-10 flex-1 text-right font-mono text-xs text-slate-400"
+                >49.4K</span
+              >
+            </div>
+            <div
+              class="hover:bg-bg-panel group relative flex cursor-pointer px-4 py-1"
+            >
+              <div
+                class="bg-accent-red/10 group-hover:bg-accent-red/20 absolute inset-y-0 right-0 w-[15%] transition-all"
+              ></div>
+              <span
+                class="text-accent-red relative z-10 flex-1 font-mono text-xs"
+                >41,242.10</span
+              >
+              <span
+                class="relative z-10 flex-1 text-right font-mono text-xs text-slate-300"
+                >0.050</span
+              >
+              <span
+                class="relative z-10 flex-1 text-right font-mono text-xs text-slate-400"
+                >2.0K</span
+              >
+            </div>
+            <div
+              class="hover:bg-bg-panel group relative flex cursor-pointer px-4 py-1"
+            >
+              <div
+                class="bg-accent-red/10 group-hover:bg-accent-red/20 absolute inset-y-0 right-0 w-[70%] transition-all"
+              ></div>
+              <span
+                class="text-accent-red relative z-10 flex-1 font-mono text-xs"
+                >41,240.50</span
+              >
+              <span
+                class="relative z-10 flex-1 text-right font-mono text-xs text-slate-300"
+                >2.500</span
+              >
+              <span
+                class="relative z-10 flex-1 text-right font-mono text-xs text-slate-400"
+                >103K</span
+              >
+            </div>
+            <div
+              class="hover:bg-bg-panel group relative flex cursor-pointer px-4 py-1"
+            >
+              <div
+                class="bg-accent-red/10 group-hover:bg-accent-red/20 absolute inset-y-0 right-0 w-[40%] transition-all"
+              ></div>
+              <span
+                class="text-accent-red relative z-10 flex-1 font-mono text-xs"
+                >41,238.00</span
+              >
+              <span
+                class="relative z-10 flex-1 text-right font-mono text-xs text-slate-300"
+                >0.800</span
+              >
+              <span
+                class="relative z-10 flex-1 text-right font-mono text-xs text-slate-400"
+                >32.9K</span
+              >
+            </div>
+            <div
+              class="hover:bg-bg-panel group relative flex cursor-pointer px-4 py-1"
+            >
+              <div
+                class="bg-accent-red/10 group-hover:bg-accent-red/20 absolute inset-y-0 right-0 w-[20%] transition-all"
+              ></div>
+              <span
+                class="text-accent-red relative z-10 flex-1 font-mono text-xs"
+                >41,236.50</span
+              >
+              <span
+                class="relative z-10 flex-1 text-right font-mono text-xs text-slate-300"
+                >0.300</span
+              >
+              <span
+                class="relative z-10 flex-1 text-right font-mono text-xs text-slate-400"
+                >12.3K</span
+              >
+            </div>
+          </div>
+        </div>
+        <!-- Spread Indicator -->
+        <div
+          class="border-border-color bg-bg-panel/50 flex items-center justify-between border-y px-4 py-2"
+        >
+          <span class="font-mono text-xs font-bold text-white">41,230.50</span>
+          <span class="text-text-secondary font-mono text-xs"
+            >Spread: 0.02%</span
+          >
+        </div>
+        <!-- Bids (Green) -->
+        <div class="scanlines relative flex-1 overflow-y-auto">
+          <div
+            class="hover:bg-bg-panel group relative flex cursor-pointer px-4 py-1"
+          >
+            <div
+              class="bg-accent-green/10 group-hover:bg-accent-green/20 absolute inset-y-0 right-0 w-[20%] transition-all"
+            ></div>
+            <span
+              class="text-accent-green relative z-10 flex-1 font-mono text-xs"
+              >41,230.00</span
+            >
+            <span
+              class="relative z-10 flex-1 text-right font-mono text-xs text-slate-300"
+              >0.250</span
+            >
+            <span
+              class="relative z-10 flex-1 text-right font-mono text-xs text-slate-400"
+              >10.3K</span
+            >
+          </div>
+          <div
+            class="hover:bg-bg-panel group relative flex cursor-pointer px-4 py-1"
+          >
+            <div
+              class="bg-accent-green/10 group-hover:bg-accent-green/20 absolute inset-y-0 right-0 w-[60%] transition-all"
+            ></div>
+            <span
+              class="text-accent-green relative z-10 flex-1 font-mono text-xs"
+              >41,228.50</span
+            >
+            <span
+              class="relative z-10 flex-1 text-right font-mono text-xs text-slate-300"
+              >1.500</span
+            >
+            <span
+              class="relative z-10 flex-1 text-right font-mono text-xs text-slate-400"
+              >61.8K</span
+            >
+          </div>
+          <div
+            class="hover:bg-bg-panel group relative flex cursor-pointer px-4 py-1"
+          >
+            <div
+              class="bg-accent-green/10 group-hover:bg-accent-green/20 absolute inset-y-0 right-0 w-[85%] transition-all"
+            ></div>
+            <span
+              class="text-accent-green relative z-10 flex-1 font-mono text-xs"
+              >41,225.00</span
+            >
+            <span
+              class="relative z-10 flex-1 text-right font-mono text-xs text-slate-300"
+              >3.200</span
+            >
+            <span
+              class="relative z-10 flex-1 text-right font-mono text-xs text-slate-400"
+              >131K</span
+            >
+          </div>
+          <div
+            class="hover:bg-bg-panel group relative flex cursor-pointer px-4 py-1"
+          >
+            <div
+              class="bg-accent-green/10 group-hover:bg-accent-green/20 absolute inset-y-0 right-0 w-[45%] transition-all"
+            ></div>
+            <span
+              class="text-accent-green relative z-10 flex-1 font-mono text-xs"
+              >41,220.00</span
+            >
+            <span
+              class="relative z-10 flex-1 text-right font-mono text-xs text-slate-300"
+              >0.900</span
+            >
+            <span
+              class="relative z-10 flex-1 text-right font-mono text-xs text-slate-400"
+              >37.0K</span
+            >
+          </div>
+          <div
+            class="hover:bg-bg-panel group relative flex cursor-pointer px-4 py-1"
+          >
+            <div
+              class="bg-accent-green/10 group-hover:bg-accent-green/20 absolute inset-y-0 right-0 w-[30%] transition-all"
+            ></div>
+            <span
+              class="text-accent-green relative z-10 flex-1 font-mono text-xs"
+              >41,218.00</span
+            >
+            <span
+              class="relative z-10 flex-1 text-right font-mono text-xs text-slate-300"
+              >0.500</span
+            >
+            <span
+              class="relative z-10 flex-1 text-right font-mono text-xs text-slate-400"
+              >20.6K</span
+            >
+          </div>
+        </div>
+      </aside>
+      <!-- Center Panel: Chart (55%) -->
+      <section
+        class="bg-bg-darkest border-border-color flex min-w-[500px] flex-1 flex-col border-r"
+      >
+        <!-- Chart Toolbar -->
+        <div
+          class="border-border-color bg-bg-dark flex h-12 items-center justify-between border-b px-4"
+        >
+          <div class="flex gap-4">
+            <div class="bg-bg-panel flex rounded p-0.5">
+              <button
+                class="text-text-secondary hover:bg-bg-dark rounded px-3 py-1 text-xs font-medium hover:text-white"
+              >
+                1m
+              </button>
+              <button
+                class="text-text-secondary hover:bg-bg-dark rounded px-3 py-1 text-xs font-medium hover:text-white"
+              >
+                5m
+              </button>
+              <button
+                class="text-text-secondary hover:bg-bg-dark rounded px-3 py-1 text-xs font-medium hover:text-white"
+              >
+                15m
+              </button>
+              <button
+                class="bg-border-color rounded px-3 py-1 text-xs font-bold text-white shadow-sm"
+              >
+                1h
+              </button>
+              <button
+                class="text-text-secondary hover:bg-bg-dark rounded px-3 py-1 text-xs font-medium hover:text-white"
+              >
+                4h
+              </button>
+              <button
+                class="text-text-secondary hover:bg-bg-dark rounded px-3 py-1 text-xs font-medium hover:text-white"
+              >
+                1D
+              </button>
+            </div>
+            <div class="bg-border-color h-6 w-px self-center"></div>
+            <div class="flex items-center gap-2">
+              <button
+                class="text-text-secondary flex items-center gap-1 px-2 py-1 text-xs hover:text-white"
+              >
+                <span class="material-symbols-outlined text-[16px]"
+                  >show_chart</span
+                >
+                Indicators
+              </button>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button
+              class="rounded border border-primary/30 bg-primary/10 px-2 py-1 text-xs font-medium text-primary"
+            >
+              MA
+            </button>
+            <button
+              class="text-text-secondary border-border-color rounded border px-2 py-1 text-xs font-medium hover:text-white"
+            >
+              BB
+            </button>
+            <button
+              class="text-text-secondary border-border-color rounded border px-2 py-1 text-xs font-medium hover:text-white"
+            >
+              VOL
+            </button>
+          </div>
+        </div>
+        <!-- Chart Area -->
+        <div class="relative h-full w-full flex-1 bg-[#0b1217]">
+          <!-- Grid Lines -->
+          <div
+            class="absolute inset-0 z-0 opacity-10"
+            style="
+              background-image:
+                linear-gradient(#20474b 1px, transparent 1px),
+                linear-gradient(90deg, #20474b 1px, transparent 1px);
+              background-size: 40px 40px;
+            "
+          ></div>
+          <!-- Mock Chart SVG -->
+          <svg
+            class="absolute inset-0 z-10 h-full w-full p-8"
+            preserveaspectratio="none"
+          >
+            <defs>
+              <lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+                <stop
+                  offset="0%"
+                  stop-color="#0bda54"
+                  stop-opacity="0.2"
+                ></stop>
+                <stop
+                  offset="100%"
+                  stop-color="#0bda54"
+                  stop-opacity="0"
+                ></stop>
+              </lineargradient>
+            </defs>
+            <!-- Candlesticks (Simplified as lines/rects for mockup) -->
+            <!-- Green Candle -->
+            <line
+              stroke="#0bda54"
+              stroke-width="1"
+              x1="10%"
+              x2="10%"
+              y1="60%"
+              y2="40%"
+            ></line>
+            <rect
+              fill="#0bda54"
+              height="10%"
+              width="1%"
+              x="9.5%"
+              y="45%"
+            ></rect>
+            <!-- Red Candle -->
+            <line
+              stroke="#ff4d4d"
+              stroke-width="1"
+              x1="15%"
+              x2="15%"
+              y1="55%"
+              y2="35%"
+            ></line>
+            <rect
+              fill="#ff4d4d"
+              height="8%"
+              width="1%"
+              x="14.5%"
+              y="40%"
+            ></rect>
+            <!-- Main Trend Line -->
+            <path
+              d="M0,80 Q100,60 200,85 T400,50 T600,65 T800,30 T1000,45"
+              fill="url(#chartGradient)"
+              stroke="#0bda54"
+              stroke-width="2"
+              vector-effect="non-scaling-stroke"
+            ></path>
+            <!-- Volume Bars at Bottom -->
+            <rect
+              fill="#20474b"
+              height="10%"
+              opacity="0.5"
+              width="2%"
+              x="5%"
+              y="85%"
+            ></rect>
+            <rect
+              fill="#0bda54"
+              height="15%"
+              opacity="0.5"
+              width="2%"
+              x="10%"
+              y="80%"
+            ></rect>
+            <rect
+              fill="#ff4d4d"
+              height="7%"
+              opacity="0.5"
+              width="2%"
+              x="15%"
+              y="88%"
+            ></rect>
+            <rect
+              fill="#0bda54"
+              height="20%"
+              opacity="0.5"
+              width="2%"
+              x="20%"
+              y="75%"
+            ></rect>
+            <rect
+              fill="#20474b"
+              height="13%"
+              opacity="0.5"
+              width="2%"
+              x="25%"
+              y="82%"
+            ></rect>
+          </svg>
+          <!-- Current Price Indicator Line -->
+          <div
+            class="border-accent-green absolute right-0 top-[35%] z-20 flex w-full items-center justify-end border-t border-dashed"
+          >
+            <span
+              class="bg-accent-green text-bg-darkest rounded-l-sm px-1.5 py-0.5 font-mono text-xs font-bold"
+              >41,230.50</span
+            >
+          </div>
+          <!-- Price Axis -->
+          <div
+            class="border-border-color bg-bg-dark text-text-secondary absolute bottom-0 right-0 top-0 z-30 flex w-12 select-none flex-col justify-between border-l px-1 py-8 text-right font-mono text-[10px]"
+          >
+            <span>42,500</span>
+            <span>42,000</span>
+            <span>41,500</span>
+            <span>41,000</span>
+            <span>40,500</span>
+            <span>40,000</span>
+          </div>
+        </div>
+      </section>
+      <!-- Right Panel: Orders & Trade (25%) -->
+      <aside class="bg-bg-dark z-20 flex w-[25%] min-w-[320px] flex-col">
+        <!-- Tabs -->
+        <div class="border-border-color flex border-b">
+          <button
+            class="bg-bg-dark flex-1 border-b-2 border-primary py-3 text-sm font-bold text-primary"
+          >
+            Positions
+          </button>
+          <button
+            class="text-text-secondary hover:bg-bg-panel flex-1 py-3 text-sm font-medium transition hover:text-white"
+          >
+            Orders
+          </button>
+          <button
+            class="text-text-secondary hover:bg-bg-panel flex-1 py-3 text-sm font-medium transition hover:text-white"
+          >
+            History
+          </button>
+        </div>
+        <!-- Content: Positions List -->
+        <div class="bg-bg-darkest/50 flex-1 overflow-y-auto p-4">
+          <!-- Empty State Placeholder or Mock Data -->
+          <div class="space-y-3">
+            <!-- Position Card 1 -->
+            <div class="bg-bg-panel border-border-color rounded-lg border p-3">
+              <div class="mb-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-accent-green text-sm font-bold">Long</span>
+                  <span class="text-sm font-bold text-white">BTC/USDT</span>
+                  <span
+                    class="bg-bg-dark text-text-secondary border-border-color rounded border px-1.5 py-0.5 text-[10px]"
+                    >20x</span
+                  >
+                </div>
+                <span class="text-accent-green font-mono text-sm"
+                  >+ $124.50</span
+                >
+              </div>
+              <div class="grid grid-cols-2 gap-y-2 text-xs">
+                <div class="text-text-secondary">Size</div>
+                <div class="text-right font-mono text-white">0.5 BTC</div>
+                <div class="text-text-secondary">Entry Price</div>
+                <div class="text-right font-mono text-white">40,150.00</div>
+                <div class="text-text-secondary">Mark Price</div>
+                <div class="text-right font-mono text-white">41,230.50</div>
+              </div>
+            </div>
+            <!-- Position Card 2 -->
+            <div
+              class="bg-bg-panel border-border-color rounded-lg border p-3 opacity-70"
+            >
+              <div class="mb-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-accent-red text-sm font-bold">Short</span>
+                  <span class="text-sm font-bold text-white">ETH/USDT</span>
+                  <span
+                    class="bg-bg-dark text-text-secondary border-border-color rounded border px-1.5 py-0.5 text-[10px]"
+                    >10x</span
+                  >
+                </div>
+                <span class="text-accent-red font-mono text-sm">- $45.20</span>
+              </div>
+              <div class="grid grid-cols-2 gap-y-2 text-xs">
+                <div class="text-text-secondary">Size</div>
+                <div class="text-right font-mono text-white">5.0 ETH</div>
+                <div class="text-text-secondary">Entry Price</div>
+                <div class="text-right font-mono text-white">2,250.00</div>
+                <div class="text-text-secondary">Mark Price</div>
+                <div class="text-right font-mono text-white">2,265.50</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Place Order Form -->
+        <div
+          class="bg-bg-dark border-border-color flex flex-col gap-4 border-t p-4"
+        >
+          <div class="bg-bg-panel flex rounded-lg p-1">
+            <button
+              class="text-bg-darkest flex-1 rounded bg-primary py-1.5 text-xs font-bold shadow-sm"
+            >
+              Limit
+            </button>
+            <button
+              class="text-text-secondary flex-1 py-1.5 text-xs font-medium transition hover:text-white"
+            >
+              Market
+            </button>
+            <button
+              class="text-text-secondary flex-1 py-1.5 text-xs font-medium transition hover:text-white"
+            >
+              Stop
+            </button>
+          </div>
+          <div
+            class="text-text-secondary mb-[-8px] flex justify-between text-xs"
+          >
+            <span
+              >Avail:
+              <span class="font-mono text-white">14,250 USDT</span></span
+            >
+            <span class="material-symbols-outlined cursor-pointer text-[14px]"
+              >account_balance_wallet</span
+            >
+          </div>
+          <!-- Inputs -->
+          <div class="space-y-3">
+            <div class="relative">
+              <label
+                class="text-text-secondary absolute left-3 top-2 text-[10px]"
+                >Price (USDT)</label
+              >
+              <input
+                class="bg-bg-darkest border-border-color w-full rounded-lg border px-3 pb-2 pt-5 text-right font-mono text-sm text-white outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary"
+                type="text"
+                value="41,230.50"
+              />
+            </div>
+            <div class="relative">
+              <label
+                class="text-text-secondary absolute left-3 top-2 text-[10px]"
+                >Amount (BTC)</label
+              >
+              <input
+                class="bg-bg-darkest border-border-color w-full rounded-lg border px-3 pb-2 pt-5 text-right font-mono text-sm text-white outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary"
+                placeholder="0.00"
+                type="text"
+              />
+              <div
+                class="pointer-events-none absolute right-3 top-[50%] hidden translate-y-[-50%]"
+              >
+                BTC
+              </div>
+            </div>
+          </div>
+          <!-- Slider -->
+          <div class="space-y-2">
+            <div class="text-text-secondary flex justify-between text-xs">
+              <span>Leverage</span>
+              <span class="font-bold text-primary">20x</span>
+            </div>
+            <input
+              class="bg-bg-panel [&amp;::-webkit-slider-thumb]:appearance-none [&amp;::-webkit-slider-thumb]:h-3 [&amp;::-webkit-slider-thumb]:w-3 [&amp;::-webkit-slider-thumb]:rounded-full [&amp;::-webkit-slider-thumb]:bg-primary h-1.5 w-full cursor-pointer appearance-none rounded-lg"
+              max="100"
+              min="1"
+              type="range"
+              value="20"
+            />
+            <div
+              class="text-text-secondary flex justify-between font-mono text-[10px] opacity-60"
+            >
+              <span>1x</span>
+              <span>25x</span>
+              <span>50x</span>
+              <span>75x</span>
+              <span>100x</span>
+            </div>
+          </div>
+          <!-- Order Summary -->
+          <div
+            class="border-border-color mt-2 flex justify-between border-t py-2 text-xs"
+          >
+            <span class="text-text-secondary">Total (USDT)</span>
+            <span class="font-mono font-bold text-white">0.00</span>
+          </div>
+          <!-- Action Buttons -->
+          <div class="grid grid-cols-2 gap-3">
+            <button
+              class="bg-accent-green text-bg-darkest flex flex-col items-center rounded-lg py-3 text-sm font-bold leading-tight transition-colors hover:bg-green-500"
+            >
+              <span>Buy / Long</span>
+            </button>
+            <button
+              class="bg-accent-red flex flex-col items-center rounded-lg py-3 text-sm font-bold leading-tight text-white transition-colors hover:bg-red-500"
+            >
+              <span>Sell / Short</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </body>
+</html>

@@ -5,6 +5,11 @@
 
 @layer base {
   :root {
+    --content-max-width: 1440px;
+    --font-space-grotesk: "Space Grotesk", "Inter", "Segoe UI", system-ui,
+      sans-serif;
+    --font-jetbrains-mono: "JetBrains Mono", "SFMono-Regular", ui-monospace,
+      "Cascadia Mono", "Segoe UI Mono", monospace;
     --background: 216 35% 98%;
     --foreground: 222 47% 11%;
     --surface: 0 0% 100%;
