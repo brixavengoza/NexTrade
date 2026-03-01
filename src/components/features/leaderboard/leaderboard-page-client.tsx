@@ -395,14 +395,17 @@ export function LeaderboardPageClient() {
   const safePage = Math.min(page, totalPages);
   const startIndex = (safePage - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, totalRows);
+  const allRows = viewModel?.rows ?? [];
   const visibleRows = viewModel?.rows.slice(startIndex, endIndex) ?? [];
-  const selectedRow =
-    visibleRows.find((row) => row.wallet === selectedWallet) ?? visibleRows[0];
-  const derivedAllocationUsd = selectedRow ? getSuggestedAllocation(selectedRow) : 0;
-  const derivedMaxPositionSize = selectedRow
-    ? Math.max(1, Math.min(100, Math.round(selectedRow.winRate / 2)))
+  const selectedRow = selectedWallet
+    ? allRows.find((row) => row.wallet === selectedWallet) ?? null
+    : null;
+  const activeRow = selectedRow ?? (!selectedWallet ? visibleRows[0] : undefined);
+  const derivedAllocationUsd = activeRow ? getSuggestedAllocation(activeRow) : 0;
+  const derivedMaxPositionSize = activeRow
+    ? Math.max(1, Math.min(100, Math.round(activeRow.winRate / 2)))
     : 25;
-  const derivedStopLoss = selectedRow ? getSuggestedStopLoss(selectedRow) : 10;
+  const derivedStopLoss = activeRow ? getSuggestedStopLoss(activeRow) : 10;
   const allocationValue = allocationUsd ?? derivedAllocationUsd;
   const maxPositionValue = maxPositionSize ?? derivedMaxPositionSize;
   const stopLossValue = stopLoss ?? derivedStopLoss;
@@ -416,7 +419,7 @@ export function LeaderboardPageClient() {
   };
 
   const handleCopy = () => {
-    if (!selectedRow) {
+    if (!activeRow) {
       toast.error("Select a trader before starting copy trading.");
       return;
     }
@@ -427,8 +430,8 @@ export function LeaderboardPageClient() {
     }
 
     const payload: CopyTradeConfig = {
-      wallet: selectedRow.wallet,
-      symbol: selectedRow.symbol,
+      wallet: activeRow.wallet,
+      symbol: activeRow.symbol,
       chain,
       allocationUsd: allocationValue,
       maxPositionSize: maxPositionValue,
@@ -445,7 +448,7 @@ export function LeaderboardPageClient() {
     writeCopyTradingStorage(next);
     notifyCopyTradingStorageChange();
 
-    toast.success(`Copy trading ${selectedRow.wallet} is now active.`);
+    toast.success(`Copy trading ${activeRow.wallet} is now active.`);
   };
 
   return (
@@ -583,7 +586,7 @@ export function LeaderboardPageClient() {
 
                   {visibleRows.map((row) => {
                     const styles = rankStyles(row.rank);
-                    const isSelected = selectedRow?.wallet === row.wallet;
+                    const isSelected = activeRow?.wallet === row.wallet;
                     return (
                       <tr
                         key={row.wallet}
@@ -711,7 +714,7 @@ export function LeaderboardPageClient() {
 
         <div ref={copyPanelRef} className="xl:sticky xl:top-24 xl:self-start">
           <CopyPanel
-            row={selectedRow}
+            row={activeRow}
             allocationUsd={allocationValue}
             maxPositionSize={maxPositionValue}
             stopLoss={stopLossValue}

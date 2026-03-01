@@ -60,7 +60,9 @@ export const leaderboardApi = {
     return response.json();
   },
 
-  async getGlobal(options: RequestOptions = {}): Promise<LeaderboardGlobalResponse> {
+  async getGlobal(
+    options: RequestOptions = {}
+  ): Promise<LeaderboardGlobalResponse> {
     const response = await fetch(
       `${this.apiUrl}/global`,
       buildRequestInit(options)
@@ -77,15 +79,18 @@ export const leaderboardApi = {
     chain: LeaderboardChain,
     options: RequestOptions = {}
   ): Promise<LeaderboardPayload> {
-    try {
-      const [markets, global] = await Promise.all([
-        this.getMarkets(chain, options),
-        this.getGlobal(options).catch(() => null),
-      ]);
+    const [marketsResult, globalResult] = await Promise.allSettled([
+      this.getMarkets(chain, options),
+      this.getGlobal(options),
+    ]);
 
-      return { markets, global };
-    } catch {
-      return { markets: [], global: null };
+    if (marketsResult.status === "rejected") {
+      throw marketsResult.reason;
     }
+
+    const global =
+      globalResult.status === "fulfilled" ? globalResult.value : null;
+
+    return { markets: marketsResult.value, global };
   },
 };
