@@ -1,7 +1,19 @@
 import type { NextConfig } from "next";
+import path from "node:path";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  turbopack: {
+    root: path.resolve(__dirname),
+  },
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...(config.resolve.alias ?? {}),
+      "@react-native-async-storage/async-storage": false,
+      "pino-pretty": false,
+    };
+    return config;
+  },
   images: {
     remotePatterns: [
       {
