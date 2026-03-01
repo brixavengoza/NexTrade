@@ -1,0 +1,876 @@
+<!doctype html>
+
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>NexTrade Market Overview Dashboard</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <!-- Material Symbols -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Theme Config -->
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#00E5FF", // Electric Cyan
+              "primary-dim": "rgba(0, 229, 255, 0.1)",
+              "background-dark": "#080B11", // Deepest background
+              "surface-dark": "#0D1117", // Card background
+              "border-dark": "#1C2333", // Border color
+              success: "#00FF94",
+              danger: "#FF4D4D",
+            },
+            fontFamily: {
+              display: ["Space Grotesk", "sans-serif"], // Proxy for Syne/Geist
+              mono: ["JetBrains Mono", "monospace"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              lg: "1rem", // 16px
+              xl: "1.5rem",
+              full: "9999px",
+            },
+            backgroundImage: {
+              "dot-grid": "radial-gradient(#1C2333 1px, transparent 1px)",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #080b11;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #1c2333;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #2d3748;
+      }
+
+      /* Ticker Animation */
+      @keyframes scroll {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+      .animate-scroll {
+        animation: scroll 30s linear infinite;
+      }
+
+      /* Glow Effect on Hover */
+      .hover-glow:hover {
+        box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+        border-color: rgba(0, 229, 255, 0.4);
+      }
+    </style>
+  </head>
+  <body
+    class="bg-background-dark font-display relative flex min-h-screen flex-col overflow-x-hidden text-slate-300 antialiased"
+  >
+    <!-- Dot Grid Background Texture -->
+    <div
+      class="pointer-events-none absolute inset-0 z-0 opacity-20"
+      style="
+        background-size: 24px 24px;
+        background-image: radial-gradient(#2d3748 1px, transparent 1px);
+      "
+    ></div>
+    <!-- Top Navigation -->
+    <header
+      class="border-border-dark bg-background-dark/90 relative sticky top-0 z-10 w-full border-b backdrop-blur-md"
+    >
+      <div
+        class="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-6"
+      >
+        <!-- Logo -->
+        <div class="flex items-center gap-3 text-white">
+          <div class="flex size-8 items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-[32px]">token</span>
+          </div>
+          <h1 class="text-xl font-bold tracking-tight text-white">NexTrade</h1>
+        </div>
+        <!-- Nav Links -->
+        <nav class="hidden items-center gap-8 md:flex">
+          <a class="text-sm font-medium text-primary transition-colors" href="#"
+            >Markets</a
+          >
+          <a
+            class="text-sm font-medium text-slate-400 transition-colors hover:text-white"
+            href="#"
+            >Trade</a
+          >
+          <a
+            class="text-sm font-medium text-slate-400 transition-colors hover:text-white"
+            href="#"
+            >Leaderboard</a
+          >
+          <a
+            class="text-sm font-medium text-slate-400 transition-colors hover:text-white"
+            href="#"
+            >Portfolio</a
+          >
+        </nav>
+        <!-- Connect Wallet -->
+        <button
+          class="bg-primary-dim hover:text-background-dark group relative rounded-lg border border-primary/30 px-5 py-2 text-sm font-bold tracking-wide text-primary shadow-[0_0_10px_rgba(0,229,255,0.1)] transition-all duration-300 hover:bg-primary hover:shadow-[0_0_20px_rgba(0,229,255,0.4)]"
+        >
+          <span class="relative z-10 flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px]"
+              >account_balance_wallet</span
+            >
+            Connect Wallet
+          </span>
+        </button>
+      </div>
+    </header>
+    <!-- Ticker Tape -->
+    <div
+      class="border-border-dark bg-surface-dark/50 relative z-10 flex h-12 items-center overflow-hidden border-b"
+    >
+      <div
+        class="animate-scroll flex w-max items-center gap-8 whitespace-nowrap px-4"
+      >
+        <!-- Repeated Items for infinite scroll effect -->
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-200">BTC</span>
+          <span class="font-mono text-sm text-white">$64,230.50</span>
+          <span class="text-success font-mono text-xs">+2.4%</span>
+        </div>
+        <div class="bg-border-dark h-4 w-px"></div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-200">ETH</span>
+          <span class="font-mono text-sm text-white">$3,450.12</span>
+          <span class="text-danger font-mono text-xs">-0.8%</span>
+        </div>
+        <div class="bg-border-dark h-4 w-px"></div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-200">SOL</span>
+          <span class="font-mono text-sm text-white">$145.80</span>
+          <span class="text-success font-mono text-xs">+5.2%</span>
+        </div>
+        <div class="bg-border-dark h-4 w-px"></div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-200">BNB</span>
+          <span class="font-mono text-sm text-white">$590.20</span>
+          <span class="text-success font-mono text-xs">+1.1%</span>
+        </div>
+        <div class="bg-border-dark h-4 w-px"></div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-200">ADA</span>
+          <span class="font-mono text-sm text-white">$0.45</span>
+          <span class="text-danger font-mono text-xs">-1.5%</span>
+        </div>
+        <div class="bg-border-dark h-4 w-px"></div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-200">XRP</span>
+          <span class="font-mono text-sm text-white">$0.62</span>
+          <span class="text-success font-mono text-xs">+0.5%</span>
+        </div>
+        <div class="bg-border-dark h-4 w-px"></div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-200">DOGE</span>
+          <span class="font-mono text-sm text-white">$0.16</span>
+          <span class="text-success font-mono text-xs">+8.4%</span>
+        </div>
+        <div class="bg-border-dark h-4 w-px"></div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-200">DOT</span>
+          <span class="font-mono text-sm text-white">$7.20</span>
+          <span class="text-danger font-mono text-xs">-2.1%</span>
+        </div>
+        <!-- Duplicates for seamless loop -->
+        <div class="bg-border-dark h-4 w-px"></div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-200">BTC</span>
+          <span class="font-mono text-sm text-white">$64,230.50</span>
+          <span class="text-success font-mono text-xs">+2.4%</span>
+        </div>
+        <div class="bg-border-dark h-4 w-px"></div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-200">ETH</span>
+          <span class="font-mono text-sm text-white">$3,450.12</span>
+          <span class="text-danger font-mono text-xs">-0.8%</span>
+        </div>
+        <div class="bg-border-dark h-4 w-px"></div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-200">SOL</span>
+          <span class="font-mono text-sm text-white">$145.80</span>
+          <span class="text-success font-mono text-xs">+5.2%</span>
+        </div>
+        <div class="bg-border-dark h-4 w-px"></div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-200">BNB</span>
+          <span class="font-mono text-sm text-white">$590.20</span>
+          <span class="text-success font-mono text-xs">+1.1%</span>
+        </div>
+      </div>
+    </div>
+    <!-- Main Content Area -->
+    <main class="relative z-10 mx-auto w-full max-w-[1440px] flex-grow p-6">
+      <div class="grid h-full grid-cols-1 gap-6 lg:grid-cols-12">
+        <!-- Left Column: Top Gainers/Losers (3 cols) -->
+        <div class="flex flex-col gap-6 lg:col-span-3">
+          <!-- Top Gainers -->
+          <div
+            class="bg-surface-dark border-border-dark hover-glow flex flex-col gap-4 rounded-lg border p-5 transition-all duration-300"
+          >
+            <div
+              class="border-border-dark flex items-center justify-between border-b pb-2"
+            >
+              <div class="flex items-center gap-2 text-white">
+                <span class="material-symbols-outlined text-success"
+                  >trending_up</span
+                >
+                <h3 class="text-sm font-semibold uppercase tracking-wider">
+                  Top Gainers
+                </h3>
+              </div>
+              <button class="text-xs text-primary hover:underline">
+                View All
+              </button>
+            </div>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white"
+                  >
+                    PEPE
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-white">PEPE</p>
+                    <p class="font-mono text-xs text-slate-400">$0.000008</p>
+                  </div>
+                </div>
+                <span
+                  class="text-success bg-success/10 rounded px-2 py-1 font-mono text-sm"
+                  >+18.4%</span
+                >
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white"
+                  >
+                    RNDR
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-white">RNDR</p>
+                    <p class="font-mono text-xs text-slate-400">$10.24</p>
+                  </div>
+                </div>
+                <span
+                  class="text-success bg-success/10 rounded px-2 py-1 font-mono text-sm"
+                  >+12.1%</span
+                >
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white"
+                  >
+                    NEAR
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-white">NEAR</p>
+                    <p class="font-mono text-xs text-slate-400">$7.85</p>
+                  </div>
+                </div>
+                <span
+                  class="text-success bg-success/10 rounded px-2 py-1 font-mono text-sm"
+                  >+9.5%</span
+                >
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white"
+                  >
+                    FET
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-white">FET</p>
+                    <p class="font-mono text-xs text-slate-400">$2.40</p>
+                  </div>
+                </div>
+                <span
+                  class="text-success bg-success/10 rounded px-2 py-1 font-mono text-sm"
+                  >+8.2%</span
+                >
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white"
+                  >
+                    AGIX
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-white">AGIX</p>
+                    <p class="font-mono text-xs text-slate-400">$0.98</p>
+                  </div>
+                </div>
+                <span
+                  class="text-success bg-success/10 rounded px-2 py-1 font-mono text-sm"
+                  >+7.9%</span
+                >
+              </div>
+            </div>
+          </div>
+          <!-- Top Losers -->
+          <div
+            class="bg-surface-dark border-border-dark hover-glow flex flex-col gap-4 rounded-lg border p-5 transition-all duration-300"
+          >
+            <div
+              class="border-border-dark flex items-center justify-between border-b pb-2"
+            >
+              <div class="flex items-center gap-2 text-white">
+                <span class="material-symbols-outlined text-danger"
+                  >trending_down</span
+                >
+                <h3 class="text-sm font-semibold uppercase tracking-wider">
+                  Top Losers
+                </h3>
+              </div>
+              <button class="text-xs text-primary hover:underline">
+                View All
+              </button>
+            </div>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white"
+                  >
+                    WIF
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-white">WIF</p>
+                    <p class="font-mono text-xs text-slate-400">$3.10</p>
+                  </div>
+                </div>
+                <span
+                  class="text-danger bg-danger/10 rounded px-2 py-1 font-mono text-sm"
+                  >-8.4%</span
+                >
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white"
+                  >
+                    OP
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-white">OP</p>
+                    <p class="font-mono text-xs text-slate-400">$2.34</p>
+                  </div>
+                </div>
+                <span
+                  class="text-danger bg-danger/10 rounded px-2 py-1 font-mono text-sm"
+                  >-5.1%</span
+                >
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white"
+                  >
+                    ARB
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-white">ARB</p>
+                    <p class="font-mono text-xs text-slate-400">$1.12</p>
+                  </div>
+                </div>
+                <span
+                  class="text-danger bg-danger/10 rounded px-2 py-1 font-mono text-sm"
+                  >-4.5%</span
+                >
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white"
+                  >
+                    LDO
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-white">LDO</p>
+                    <p class="font-mono text-xs text-slate-400">$2.05</p>
+                  </div>
+                </div>
+                <span
+                  class="text-danger bg-danger/10 rounded px-2 py-1 font-mono text-sm"
+                  >-3.8%</span
+                >
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white"
+                  >
+                    TIA
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-white">TIA</p>
+                    <p class="font-mono text-xs text-slate-400">$10.45</p>
+                  </div>
+                </div>
+                <span
+                  class="text-danger bg-danger/10 rounded px-2 py-1 font-mono text-sm"
+                  >-3.2%</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Center Column: Chart & Stats (6 cols) -->
+        <div class="flex flex-col gap-6 lg:col-span-6">
+          <!-- Main Chart Card -->
+          <div
+            class="bg-surface-dark border-border-dark hover-glow flex min-h-[500px] flex-1 flex-col rounded-lg border p-6 transition-all duration-300"
+          >
+            <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <div
+                  class="flex h-10 w-10 items-center justify-center rounded-full bg-[#F7931A] text-white"
+                >
+                  <span class="material-symbols-outlined"
+                    >currency_bitcoin</span
+                  >
+                </div>
+                <div>
+                  <h2 class="text-2xl font-bold leading-tight text-white">
+                    BTC/USDT
+                  </h2>
+                  <div class="flex items-center gap-2">
+                    <span class="font-mono text-lg text-primary"
+                      >$64,230.50</span
+                    >
+                    <span
+                      class="text-success flex items-center text-sm font-medium"
+                    >
+                      <span class="material-symbols-outlined text-[16px]"
+                        >arrow_upward</span
+                      >
+                      2.4%
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <!-- Time Toggles -->
+              <div
+                class="border-border-dark flex items-center rounded-lg border bg-[#080B11] p-1"
+              >
+                <button
+                  class="rounded px-3 py-1 text-xs font-bold text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
+                >
+                  1H
+                </button>
+                <button
+                  class="text-background-dark rounded bg-primary px-3 py-1 text-xs font-bold shadow-sm"
+                >
+                  1D
+                </button>
+                <button
+                  class="rounded px-3 py-1 text-xs font-bold text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
+                >
+                  7D
+                </button>
+                <button
+                  class="rounded px-3 py-1 text-xs font-bold text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
+                >
+                  1M
+                </button>
+                <button
+                  class="rounded px-3 py-1 text-xs font-bold text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
+                >
+                  3M
+                </button>
+              </div>
+            </div>
+            <!-- Chart Area -->
+            <div
+              class="border-border-dark/50 relative mb-6 w-full flex-1 overflow-hidden rounded-lg border bg-[#080B11]/50"
+            >
+              <!-- SVG Chart Simulation -->
+              <svg
+                class="h-full w-full"
+                preserveaspectratio="none"
+                viewbox="0 0 800 300"
+              >
+                <defs>
+                  <lineargradient
+                    id="chartGradient"
+                    x1="0"
+                    x2="0"
+                    y1="0"
+                    y2="1"
+                  >
+                    <stop
+                      offset="0%"
+                      stop-color="#00E5FF"
+                      stop-opacity="0.2"
+                    ></stop>
+                    <stop
+                      offset="100%"
+                      stop-color="#00E5FF"
+                      stop-opacity="0"
+                    ></stop>
+                  </lineargradient>
+                </defs>
+                <!-- Grid Lines -->
+                <line
+                  stroke="#1C2333"
+                  stroke-dasharray="4 4"
+                  stroke-width="1"
+                  x1="0"
+                  x2="800"
+                  y1="75"
+                  y2="75"
+                ></line>
+                <line
+                  stroke="#1C2333"
+                  stroke-dasharray="4 4"
+                  stroke-width="1"
+                  x1="0"
+                  x2="800"
+                  y1="150"
+                  y2="150"
+                ></line>
+                <line
+                  stroke="#1C2333"
+                  stroke-dasharray="4 4"
+                  stroke-width="1"
+                  x1="0"
+                  x2="800"
+                  y1="225"
+                  y2="225"
+                ></line>
+                <!-- Area Path -->
+                <path
+                  d="M0,200 C50,180 100,220 150,150 C200,80 250,160 300,140 C350,120 400,100 450,110 C500,120 550,180 600,160 C650,140 700,60 750,50 L800,40 L800,300 L0,300 Z"
+                  fill="url(#chartGradient)"
+                ></path>
+                <!-- Line Path -->
+                <path
+                  d="M0,200 C50,180 100,220 150,150 C200,80 250,160 300,140 C350,120 400,100 450,110 C500,120 550,180 600,160 C650,140 700,60 750,50 L800,40"
+                  fill="none"
+                  stroke="#00E5FF"
+                  stroke-width="2"
+                ></path>
+                <!-- Current Price Indicator -->
+                <circle cx="800" cy="40" fill="#00E5FF" r="4"></circle>
+                <circle
+                  cx="800"
+                  cy="40"
+                  fill="#00E5FF"
+                  opacity="0.2"
+                  r="10"
+                ></circle>
+              </svg>
+              <!-- Tooltip simulation -->
+              <div
+                class="bg-surface-dark pointer-events-none absolute left-[70%] top-10 rounded border border-primary/30 px-3 py-2 shadow-lg backdrop-blur-sm"
+              >
+                <p class="mb-1 text-xs text-slate-400">Apr 24, 14:00</p>
+                <p class="font-mono text-sm font-bold text-white">$63,890.00</p>
+              </div>
+            </div>
+            <!-- Stat Pills -->
+            <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+              <div
+                class="border-border-dark cursor-default rounded-lg border bg-[#080B11] p-3 text-center transition-colors hover:border-primary/50"
+              >
+                <p class="mb-1 text-xs uppercase tracking-wide text-slate-500">
+                  Market Cap
+                </p>
+                <p class="font-mono text-sm font-medium text-white">$1.24T</p>
+              </div>
+              <div
+                class="border-border-dark cursor-default rounded-lg border bg-[#080B11] p-3 text-center transition-colors hover:border-primary/50"
+              >
+                <p class="mb-1 text-xs uppercase tracking-wide text-slate-500">
+                  24h Vol
+                </p>
+                <p class="font-mono text-sm font-medium text-white">$45.2B</p>
+              </div>
+              <div
+                class="border-border-dark cursor-default rounded-lg border bg-[#080B11] p-3 text-center transition-colors hover:border-primary/50"
+              >
+                <p class="mb-1 text-xs uppercase tracking-wide text-slate-500">
+                  Dominance
+                </p>
+                <p class="font-mono text-sm font-medium text-white">52.4%</p>
+              </div>
+              <div
+                class="border-border-dark group relative cursor-default overflow-hidden rounded-lg border bg-[#080B11] p-3 text-center transition-colors hover:border-primary/50"
+              >
+                <div
+                  class="via-success/10 absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent to-transparent duration-1000 group-hover:translate-x-full"
+                ></div>
+                <p class="mb-1 text-xs uppercase tracking-wide text-slate-500">
+                  Greed Index
+                </p>
+                <p class="text-success font-mono text-sm font-medium">
+                  72 (Greed)
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Right Column: Trending & Gas (3 cols) -->
+        <div class="flex flex-col gap-6 lg:col-span-3">
+          <!-- Trending Protocols -->
+          <div
+            class="bg-surface-dark border-border-dark hover-glow rounded-lg border p-5 transition-all duration-300"
+          >
+            <div class="mb-5 flex items-center gap-2 text-white">
+              <span class="material-symbols-outlined text-primary"
+                >local_fire_department</span
+              >
+              <h3 class="text-sm font-semibold uppercase tracking-wider">
+                Trending DeFi
+              </h3>
+            </div>
+            <div class="space-y-4">
+              <div
+                class="group flex cursor-pointer items-center justify-between"
+              >
+                <div class="flex items-center gap-3">
+                  <span class="font-mono text-xs text-slate-500">01</span>
+                  <div class="flex flex-col">
+                    <span
+                      class="text-sm font-bold text-white transition-colors group-hover:text-primary"
+                      >EigenLayer</span
+                    >
+                    <span
+                      class="mt-0.5 w-fit rounded bg-[#1C2333] px-1.5 text-[10px] text-slate-400"
+                      >Ethereum</span
+                    >
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-xs uppercase text-slate-500">TVL</p>
+                  <p class="font-mono text-sm font-medium text-white">$15.2B</p>
+                </div>
+              </div>
+              <div class="bg-border-dark h-px w-full"></div>
+              <div
+                class="group flex cursor-pointer items-center justify-between"
+              >
+                <div class="flex items-center gap-3">
+                  <span class="font-mono text-xs text-slate-500">02</span>
+                  <div class="flex flex-col">
+                    <span
+                      class="text-sm font-bold text-white transition-colors group-hover:text-primary"
+                      >Uniswap V3</span
+                    >
+                    <span
+                      class="mt-0.5 w-fit rounded bg-[#1C2333] px-1.5 text-[10px] text-slate-400"
+                      >Multi-chain</span
+                    >
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-xs uppercase text-slate-500">TVL</p>
+                  <p class="font-mono text-sm font-medium text-white">$6.4B</p>
+                </div>
+              </div>
+              <div class="bg-border-dark h-px w-full"></div>
+              <div
+                class="group flex cursor-pointer items-center justify-between"
+              >
+                <div class="flex items-center gap-3">
+                  <span class="font-mono text-xs text-slate-500">03</span>
+                  <div class="flex flex-col">
+                    <span
+                      class="text-sm font-bold text-white transition-colors group-hover:text-primary"
+                      >Aave V3</span
+                    >
+                    <span
+                      class="mt-0.5 w-fit rounded bg-[#1C2333] px-1.5 text-[10px] text-slate-400"
+                      >Ethereum</span
+                    >
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-xs uppercase text-slate-500">TVL</p>
+                  <p class="font-mono text-sm font-medium text-white">$11.8B</p>
+                </div>
+              </div>
+              <div class="bg-border-dark h-px w-full"></div>
+              <div
+                class="group flex cursor-pointer items-center justify-between"
+              >
+                <div class="flex items-center gap-3">
+                  <span class="font-mono text-xs text-slate-500">04</span>
+                  <div class="flex flex-col">
+                    <span
+                      class="text-sm font-bold text-white transition-colors group-hover:text-primary"
+                      >Maker</span
+                    >
+                    <span
+                      class="mt-0.5 w-fit rounded bg-[#1C2333] px-1.5 text-[10px] text-slate-400"
+                      >Ethereum</span
+                    >
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-xs uppercase text-slate-500">TVL</p>
+                  <p class="font-mono text-sm font-medium text-white">$8.2B</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Gas Tracker -->
+          <div
+            class="bg-surface-dark border-border-dark hover-glow flex-1 rounded-lg border p-5 transition-all duration-300"
+          >
+            <div class="mb-5 flex items-center gap-2 text-white">
+              <span class="material-symbols-outlined text-slate-400"
+                >local_gas_station</span
+              >
+              <h3 class="text-sm font-semibold uppercase tracking-wider">
+                Gas Tracker
+              </h3>
+            </div>
+            <div class="space-y-4">
+              <!-- ETH -->
+              <div
+                class="border-border-dark rounded border bg-[#080B11] p-3 transition-colors hover:border-primary/30"
+              >
+                <div class="mb-2 flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <div class="h-2 w-2 rounded-full bg-blue-500"></div>
+                    <span class="text-sm font-bold text-white">Ethereum</span>
+                  </div>
+                  <span class="font-mono text-sm text-primary">12 Gwei</span>
+                </div>
+                <div class="grid grid-cols-3 gap-1 text-center">
+                  <div class="bg-surface-dark/50 rounded py-1">
+                    <span class="block text-[10px] text-slate-500">Low</span>
+                    <span class="block font-mono text-xs text-white">11</span>
+                  </div>
+                  <div
+                    class="bg-surface-dark/50 border-success/30 rounded border py-1"
+                  >
+                    <span class="text-success block text-[10px]">Avg</span>
+                    <span class="block font-mono text-xs text-white">12</span>
+                  </div>
+                  <div class="bg-surface-dark/50 rounded py-1">
+                    <span class="block text-[10px] text-slate-500">Fast</span>
+                    <span class="block font-mono text-xs text-white">14</span>
+                  </div>
+                </div>
+              </div>
+              <!-- BNB -->
+              <div
+                class="border-border-dark rounded border bg-[#080B11] p-3 transition-colors hover:border-primary/30"
+              >
+                <div class="mb-2 flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <div class="h-2 w-2 rounded-full bg-yellow-500"></div>
+                    <span class="text-sm font-bold text-white">BNB Chain</span>
+                  </div>
+                  <span class="font-mono text-sm text-primary">3 Gwei</span>
+                </div>
+                <div class="grid grid-cols-3 gap-1 text-center">
+                  <div class="bg-surface-dark/50 rounded py-1">
+                    <span class="block text-[10px] text-slate-500">Low</span>
+                    <span class="block font-mono text-xs text-white">3</span>
+                  </div>
+                  <div
+                    class="bg-surface-dark/50 border-success/30 rounded border py-1"
+                  >
+                    <span class="text-success block text-[10px]">Avg</span>
+                    <span class="block font-mono text-xs text-white">3</span>
+                  </div>
+                  <div class="bg-surface-dark/50 rounded py-1">
+                    <span class="block text-[10px] text-slate-500">Fast</span>
+                    <span class="block font-mono text-xs text-white">3.1</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Polygon -->
+              <div
+                class="border-border-dark rounded border bg-[#080B11] p-3 transition-colors hover:border-primary/30"
+              >
+                <div class="mb-2 flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <div class="h-2 w-2 rounded-full bg-purple-500"></div>
+                    <span class="text-sm font-bold text-white">Polygon</span>
+                  </div>
+                  <span class="font-mono text-sm text-primary">180 Gwei</span>
+                </div>
+                <div class="grid grid-cols-3 gap-1 text-center">
+                  <div class="bg-surface-dark/50 rounded py-1">
+                    <span class="block text-[10px] text-slate-500">Low</span>
+                    <span class="block font-mono text-xs text-white">150</span>
+                  </div>
+                  <div
+                    class="bg-surface-dark/50 border-success/30 rounded border py-1"
+                  >
+                    <span class="text-success block text-[10px]">Avg</span>
+                    <span class="block font-mono text-xs text-white">180</span>
+                  </div>
+                  <div class="bg-surface-dark/50 rounded py-1">
+                    <span class="block text-[10px] text-slate-500">Fast</span>
+                    <span class="block font-mono text-xs text-white">210</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!-- Footer -->
+    <footer
+      class="border-border-dark bg-background-dark relative z-10 border-t px-6 py-4"
+    >
+      <div
+        class="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-4 md:flex-row"
+      >
+        <p class="text-xs text-slate-500">
+          © 2024 NexTrade Platform. All rights reserved.
+        </p>
+        <div class="flex items-center gap-4 text-xs text-slate-500">
+          <span>Powered by <span class="text-primary">NexChain</span></span>
+          <span class="h-1 w-1 rounded-full bg-slate-700"></span>
+          <a class="transition-colors hover:text-white" href="#">Terms</a>
+          <a class="transition-colors hover:text-white" href="#">Privacy</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
